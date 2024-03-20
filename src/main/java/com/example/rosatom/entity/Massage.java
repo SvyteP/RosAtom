@@ -5,6 +5,8 @@ import lombok.Data;
 import org.hibernate.annotations.ManyToAny;
 
 import java.util.ArrayList;
+import java.util.Date;
+
 @Entity
 @Table(name = "massege_table")
 @Data
@@ -16,6 +18,9 @@ public class Massage {
 
     @Column(name = "body_mass")
     private String body;
+    @Column(name = "date")
+    private Date date;
+
     @ManyToOne
     @JoinColumn(name = "users")
     private User users;
@@ -24,6 +29,14 @@ public class Massage {
     @JoinColumn(name = "topic")
     private Topic topic;
 
+    public Massage() {
+    }
 
-
+    public Massage(Long id, String body, User users, Topic topic) {
+        this.id = id;
+        this.body = body;
+        this.date = new Date();
+        this.users = users;
+        this.topic = topic;
+    }
 }
