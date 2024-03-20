@@ -15,9 +15,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private  Long id;
+
     @Column(name = "name")
     private String name;
+
     @OneToMany( cascade = CascadeType.ALL,mappedBy = "users")
     private ArrayList<Massage> massages;
 
+    @OneToMany( cascade = CascadeType.ALL,mappedBy = "users")
+    private ArrayList<Massage> topics;
 }

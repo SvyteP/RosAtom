@@ -14,6 +14,14 @@ public class Topic {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "title")
+    private String title;
+
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "topic")
     private ArrayList<Massage> topic_mass;
+
+    @ManyToOne
+    @JoinColumn(name = "users")
+    private User users;
+
 }
