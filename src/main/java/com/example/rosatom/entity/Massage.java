@@ -1,11 +1,13 @@
 package com.example.rosatom.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.hibernate.annotations.ManyToAny;
 
 import java.util.ArrayList;
 @Entity
 @Table(name = "massege_table")
+@Data
 public class Massage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
