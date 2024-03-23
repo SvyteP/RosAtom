@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class TopicServiceImpl implements TopicService {
 
     @Override
-    public void createNewTopic(Topic topic) {
+    public void createNewTopic(Topic topic ) {
 
     }
 

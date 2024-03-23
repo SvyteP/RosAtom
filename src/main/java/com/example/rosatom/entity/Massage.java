@@ -6,10 +6,9 @@ import org.hibernate.annotations.ManyToAny;
 
 import java.util.ArrayList;
 import java.util.Date;
-
+@Data
 @Entity
 @Table(name = "massege_table")
-@Data
 public class Massage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,11 +31,4 @@ public class Massage {
     public Massage() {
     }
 
-    public Massage(Long id, String body, User users, Topic topic) {
-        this.id = id;
-        this.body = body;
-        this.date = new Date();
-        this.users = users;
-        this.topic = topic;
-    }
 }

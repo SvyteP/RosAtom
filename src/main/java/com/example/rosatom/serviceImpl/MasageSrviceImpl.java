@@ -13,6 +13,8 @@ import com.example.rosatom.service.MassageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class MasageSrviceImpl implements MassageService {
     MassageRepository massageRepository;
@@ -27,21 +29,21 @@ public class MasageSrviceImpl implements MassageService {
     @Override
     public void removeMassage(MassageModel massageModel) throws Exception {
         try {
-            if (CheckMethods.checkExistAll(massageModel)){
-                Topic topic = topicRepository.findById(massageModel.getTopicId()).get();
-                Massage massage = massageRepository.findById(massageModel.getMassageId()).get();
-                User user = userRepository.findById(massageModel.getUserId()).get();
+                Topic topic = topicRepository.findById(massageModel.getTopicId()).orElseThrow();
+                Massage massage = massageRepository.findById(massageModel.getMassageId()).orElseThrow();
+                User user = userRepository.findById(massageModel.getUserId()).orElseThrow();
 
-                if(CheckMethods.checkMassage(topic,massage,user)){
-                    massageRepository.delete(massage);
-                    massageRepository.save(massage);
-
+                if(!CheckMethods.checkMassage(topic,massage,user)){
+                    throw new NotFoundExeption("Сообщение не найдено / Пользователь не является создателем сообщения");
+                }
+                else {
+                    user.getMassages().remove(massage);
+                    topic.getTopic_mass().remove(massage);
+                    massageRepository.deleteById(massageModel.getMassageId());
+                    userRepository.save(user);
+                    topicRepository.save(topic);
                 }
 
-            }
-            else {
-                throw new NotFoundExeption("Указанные данные не найдены!");
-            }
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -49,34 +51,45 @@ public class MasageSrviceImpl implements MassageService {
     }
 
     @Override
-    public void editMassage(MassageModel massageModel) {
+    public void editMassage(MassageModel massageModel) throws NotFoundExeption {
+        try
+        {
+            User user = userRepository.findById(massageModel.getUserId()).orElseThrow();
+            Topic topic = topicRepository.findById(massageModel.getTopicId()).orElseThrow();
+            Massage massage = massageRepository.findById(massageModel.getMassageId()).orElseThrow();
+           if (CheckMethods.checkMassage(topic,massage,user)){
+               massage.setBody(massageModel.getBody());
+               massageRepository.save(massage);
+           }
+           else{
+               //Здесь добавить throw new Exception
+           }
+        }
+        catch (Exception e){
+            throw new NotFoundExeption(e.getMessage());
+        }
 
     }
 
     @Override
-    public void addMassage(MassageModel massageModel) throws Exception {
+    public void addMassage(MassageModel addMassModel) throws Exception {
         try {
-            if (CheckMethods.checkExistAddMass(massageModel)){
-                Massage massage = massageModel.getMassage();
 
-                Topic topic = topicRepository.findById(massageModel.getTopicId()).get();
-                User user = userRepository.findById(massageModel.getUserId()).get();
+                Massage massage = new Massage();
+                massage.setDate(new Date());
+                massage.setBody(addMassModel.getBody());
+                Topic topic = topicRepository.findById(addMassModel.getTopicId()).orElseThrow();
+                User user = userRepository.findById(addMassModel.getUserId()).orElseThrow();
+                massage.setUsers(user);
+                massage.setTopic(topic);
 
-                    topic.getTopic_mass().add(massage);
-                    user.getMassages().add(massage);
-                    massage.setUsers(user);
-                    massage.setTopic(topic);
+                massageRepository.save(massage);
 
-                    userRepository.save(user);
-                    topicRepository.save(topic);
-                    massageRepository.save(massage);
+                topic.getTopic_mass().add(massage);
+                user.getMassages().add(massage);
 
-
-
-            }
-            else {
-                throw new NotFoundExeption("Указанные данные не найдены!");
-            }
+                userRepository.save(user);
+                topicRepository.save(topic);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

@@ -20,8 +20,8 @@ public class User {
     private String name;
 
     @OneToMany( cascade = CascadeType.ALL,mappedBy = "users")
-    private ArrayList<Massage> massages;
+    private List<Massage> massages;
 
     @OneToMany( cascade = CascadeType.ALL,mappedBy = "users")
-    private ArrayList<Massage> topics;
+    private List<Massage> topics;
 }

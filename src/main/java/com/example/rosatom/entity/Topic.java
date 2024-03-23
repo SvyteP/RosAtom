@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "topics")
@@ -18,7 +19,7 @@ public class Topic {
     private String title;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "topic")
-    private ArrayList<Massage> topic_mass;
+    private List<Massage> topic_mass;
 
     @ManyToOne
     @JoinColumn(name = "users")
