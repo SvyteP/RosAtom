@@ -5,7 +5,11 @@ import com.example.rosatom.entity.Massage;
 import com.example.rosatom.entity.Topic;
 import com.example.rosatom.entity.User;
 import com.example.rosatom.exception.NotFoundExeption;
+import com.example.rosatom.exception.OnlyMessCannotBeDelException;
+import com.example.rosatom.model.AddMassModel;
+import com.example.rosatom.model.DelMassModel;
 import com.example.rosatom.model.MassageModel;
+import com.example.rosatom.model.PresentMassModel;
 import com.example.rosatom.repository.MassageRepository;
 import com.example.rosatom.repository.TopicRepository;
 import com.example.rosatom.repository.UserRepository;
@@ -13,7 +17,7 @@ import com.example.rosatom.service.MassageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.util.List;
 
 @Service
 public class MasageSrviceImpl implements MassageService {
@@ -27,21 +31,26 @@ public class MasageSrviceImpl implements MassageService {
         this.userRepository = userRepository;
     }
     @Override
-    public void removeMassage(MassageModel massageModel) throws Exception {
+    public void removeMassage(DelMassModel massageModel) throws Exception {
         try {
                 Topic topic = topicRepository.findById(massageModel.getTopicId()).orElseThrow();
-                Massage massage = massageRepository.findById(massageModel.getMassageId()).orElseThrow();
-                User user = userRepository.findById(massageModel.getUserId()).orElseThrow();
+                if (topic.getTopic_mass().size()>1) {
+                    Massage massage = massageRepository.findById(massageModel.getMassageId()).orElseThrow();
+                    User user = userRepository.findById(massageModel.getUserId()).orElseThrow();
 
-                if(!CheckMethods.checkMassage(topic,massage,user)){
-                    throw new NotFoundExeption("Сообщение не найдено / Пользователь не является создателем сообщения");
+                    if (!CheckMethods.checkMassage(topic, massage, user)) {
+                        throw new NotFoundExeption("Message not found / User is not the creator of the message");
+                    } else {
+                        user.getMassages().remove(massage);
+                        topic.getTopic_mass().remove(massage);
+                        massageRepository.deleteById(massageModel.getMassageId());
+                        userRepository.save(user);
+                        topicRepository.save(topic);
+                    }
                 }
-                else {
-                    user.getMassages().remove(massage);
-                    topic.getTopic_mass().remove(massage);
-                    massageRepository.deleteById(massageModel.getMassageId());
-                    userRepository.save(user);
-                    topicRepository.save(topic);
+                else
+                {
+                    throw  new OnlyMessCannotBeDelException("The last message in the topic cannot be deleted!");
                 }
 
         }
@@ -62,7 +71,7 @@ public class MasageSrviceImpl implements MassageService {
                massageRepository.save(massage);
            }
            else{
-               //Здесь добавить throw new Exception
+               throw new NotFoundExeption("The specified user is not the post creator or administrator");
            }
         }
         catch (Exception e){
@@ -72,14 +81,11 @@ public class MasageSrviceImpl implements MassageService {
     }
 
     @Override
-    public void addMassage(MassageModel addMassModel) throws Exception {
+    public void addMassage(AddMassModel addMassModel) throws Exception {
         try {
-
-                Massage massage = new Massage();
-                massage.setDate(new Date());
-                massage.setBody(addMassModel.getBody());
                 Topic topic = topicRepository.findById(addMassModel.getTopicId()).orElseThrow();
                 User user = userRepository.findById(addMassModel.getUserId()).orElseThrow();
+                Massage massage = new Massage(addMassModel.getBody(),user,topic);
                 massage.setUsers(user);
                 massage.setTopic(topic);
 
@@ -93,6 +99,25 @@ public class MasageSrviceImpl implements MassageService {
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
+        }
+    }
+
+    @Override
+    public PresentMassModel readMassage(Long massageId) throws Exception {
+        try {
+            return new PresentMassModel(massageRepository.findById(massageId).orElseThrow());
+        }
+        catch (Exception e){
+            throw  new Exception(e.getMessage());
+        }
+    }
+    @Override
+    public List<PresentMassModel> readAllMassage() throws Exception {
+        try {
+            return  PresentMassModel.convertEntityInModel((List<Massage>) massageRepository.findAll());
+        }
+        catch (Exception e){
+            throw  new Exception(e.getMessage());
         }
     }
 }

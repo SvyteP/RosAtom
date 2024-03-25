@@ -1,12 +1,14 @@
 package com.example.rosatom.service;
 
-import com.example.rosatom.entity.Topic;
-import com.example.rosatom.model.TopicModel;
+import com.example.rosatom.exception.NotFoundExeption;
+import com.example.rosatom.model.*;
+
+import java.util.List;
 
 public interface TopicService {
-    public void createNewTopic(Topic topic);
-    public void removeTopic(Long topicId,Long userId);
-    public void readAllMassage(Long topicId);
-
-    /*  private void getAllTopics(){}*/
+     void createNewTopic(AddTopicModel topicModel) throws Exception;
+     void removeTopic(DelTopicModel topicModel) throws NotFoundExeption;
+     PresentTopicModel readAllMassage(Long topicId) throws Exception;
+     void editTopic(EditTopicModel topicModel) throws Exception;
+     List<AllTopicModel> readAllTopics() throws Exception;
 }

@@ -20,8 +20,24 @@ public class User {
     private String name;
 
     @OneToMany( cascade = CascadeType.ALL,mappedBy = "users")
-    private List<Massage> massages;
+    private List<Massage> massages = new ArrayList<>();
 
     @OneToMany( cascade = CascadeType.ALL,mappedBy = "users")
-    private List<Massage> topics;
+    private List<Topic> topics = new ArrayList<>();
+
+    public User() {
+    }
+
+    public User(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", massages=" + massages.stream().map(massage -> getId()) +
+                ", topics=" + topics.stream().map(topic -> getId()) +
+                '}';
+    }
 }

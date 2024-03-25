@@ -1,13 +1,21 @@
 package com.example.rosatom.service;
 
 import com.example.rosatom.exception.NotFoundExeption;
+import com.example.rosatom.model.AddMassModel;
+import com.example.rosatom.model.DelMassModel;
 import com.example.rosatom.model.MassageModel;
+import com.example.rosatom.model.PresentMassModel;
+
+import java.util.List;
 
 public interface MassageService {
 
-    public void removeMassage(MassageModel massageModel) throws Exception;
+    void removeMassage(DelMassModel massageModel) throws Exception;
 
-    public void editMassage(MassageModel massageModel) throws NotFoundExeption;
+    void editMassage(MassageModel massageModel) throws NotFoundExeption;
 
-    public void addMassage(MassageModel addMassModel) throws Exception;
+    void addMassage(AddMassModel addMassModel) throws Exception;
+    PresentMassModel readMassage(Long massageId) throws Exception;
+
+    List<PresentMassModel> readAllMassage() throws Exception;
 }

@@ -19,10 +19,17 @@ public class Topic {
     private String title;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "topic")
-    private List<Massage> topic_mass;
+    private List<Massage> topic_mass = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "users")
     private User users;
 
+    public Topic() {
+    }
+
+    public Topic(String title, User users) {
+        this.title = title;
+        this.users = users;
+    }
 }
